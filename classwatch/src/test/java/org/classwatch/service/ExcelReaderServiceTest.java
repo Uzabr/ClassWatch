@@ -1,7 +1,8 @@
 package org.classwatch.service;
-
 import org.classwatch.model.Student;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
@@ -12,36 +13,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 public class ExcelReaderServiceTest {
+
+    @Autowired
+    private  ExcelReaderService excelReaderService;
+
 
     @Test
     void testReadExcel() throws IOException {
-//                // Создаем тестовый Excel-файл
-//                Workbook workbook = new XSSFWorkbook();
-//                Sheet sheet = workbook.createSheet();
-//                for (int i = 0; i < 15; i++) {
-//                    Row row = sheet.createRow(i);
-//                    if (i >= 12) {
-//                        row.createCell(0).setCellValue("login" + i);
-//                        row.createCell(1).setCellValue("status" + i);
-//                        row.createCell(2).setCellValue("tribe" + i);
-//                        row.createCell(3).setCellValue(i);
-//                        row.createCell(5).setCellValue(i + 1);
-//                        row.createCell(7).setCellValue("2025-05-11");
-//                        row.createCell(9).setCellValue(i + 10);
-//                    }
-//                }
-        // Записываем в ByteArrayOutputStream
-//                ByteArrayOutputStream out = new ByteArrayOutputStream();
-//                workbook.write(out);
-//                ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+
         InputStream inputStream = Files.newInputStream(Paths.get("src/main/resources/test_files/students_info_ 24_12_SKD-3.xlsx"));
 
                 // Создаем MockMultipartFile
                 MockMultipartFile multipartFile = new MockMultipartFile("file", "students_info_ 24_12_SKD-3.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", inputStream );
 
                 // Вызываем метод readExcel
-                List<Student> students = ExcelReaderService.readExcel(multipartFile);
+                List<Student> students = excelReaderService.readExcel(multipartFile);
 
                 // Проверяем результаты
                 assertEquals(109, students.size());

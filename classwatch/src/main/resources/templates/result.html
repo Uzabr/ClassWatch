@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassWatch — Результаты анализа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen p-6">
+<div class="max-w-7xl mx-auto">
+    <h1 class="text-4xl font-bold text-center mb-10 text-blue-700">Результаты анализа</h1>
+
+    <!-- Прямоугольный график со шкалой -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-10">
+        <h2 class="text-2xl font-semibold mb-4">Распределение по статусам</h2>
+        <canvas id="statusChart"></canvas>
+    </div>
+
+    <!-- Разделённые списки студентов с раскрытием -->
+    <div class="space-y-6 mb-10">
+        <!-- Шаблон для раскрывающихся списков -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <button onclick="toggleSection('deadlineList')" class="w-full text-left px-6 py-4 text-red-600 text-xl font-semibold hover:bg-gray-50 transition">
+                📌 Скоро дедлайн (≤ 10 дней)
+            </button>
+            <div id="deadlineList" class="hidden px-6 pb-4">
+                <ul class="space-y-2">
+                    <li th:each="s : ${students}" th:if="${s.daysToDeadline &lt;= 10}" class="flex justify-between border-b pb-1">
+                        <span th:text="${s.login}" class="font-medium"></span>
+                        <span th:text="${s.daysToDeadline + ' дней'}" class="text-red-600 font-bold"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <button onclick="toggleSection('blockedList')" class="w-full text-left px-6 py-4 text-gray-800 text-xl font-semibold hover:bg-gray-50 transition">
+                ⛔ Заблокированы
+            </button>
+            <div id="blockedList" class="hidden px-6 pb-4">
+                <ul class="space-y-2">
+                    <li th:each="s : ${students}" th:if="${s.status == 'Заблокирован (дедлайн)'}" class="flex justify-between border-b pb-1">
+                        <span th:text="${s.login}" class="font-medium"></span>
+                        <span th:text="${s.status}" class="text-red-500"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <button onclick="toggleSection('frozenList')" class="w-full text-left px-6 py-4 text-gray-800 text-xl font-semibold hover:bg-gray-50 transition">
+                ❄️ Заморожены
+            </button>
+            <div id="frozenList" class="hidden px-6 pb-4">
+                <ul class="space-y-2">
+                    <li th:each="s : ${students}" th:if="${s.status == 'Заморожен'}" class="flex justify-between border-b pb-1">
+                        <span th:text="${s.login}" class="font-medium"></span>
+                        <span th:text="${s.status}" class="text-blue-500"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Полный список студентов -->
+    <div class="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
+        <h2 class="text-2xl font-semibold mb-4">Полный список студентов</h2>
+        <table class="w-full text-sm text-left border-collapse">
+            <thead>
+            <tr class="bg-gray-200">
+                <th class="px-4 py-2">Логин</th>
+                <th class="px-4 py-2">Статус</th>
+                <th class="px-4 py-2">Трайб</th>
+                <th class="px-4 py-2">Уровень</th>
+                <th class="px-4 py-2">Цель</th>
+                <th class="px-4 py-2">Дедлайн</th>
+                <th class="px-4 py-2">Дней до дедлайна</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="student : ${students}" class="hover:bg-gray-100">
+                <td class="border-t px-4 py-2" th:text="${student.login}"></td>
+                <td class="border-t px-4 py-2" th:text="${student.status}"></td>
+                <td class="border-t px-4 py-2" th:text="${student.tribe}"></td>
+                <td class="border-t px-4 py-2" th:text="${student.level}"></td>
+                <td class="border-t px-4 py-2" th:text="${student.targetLevel}"></td>
+                <td class="border-t px-4 py-2" th:text="${student.deadline}"></td>
+                <td class="border-t px-4 py-2" th:text="${student.daysToDeadline}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const students = /*[[${students}]]*/ [];
+    const statusCounts = {};
+    students.forEach(s => {
+        const status = s.status || 'Неизвестно';
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+    });
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(statusCounts),
+            datasets: [{
+                label: 'Количество студентов',
+                data: Object.values(statusCounts),
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+    function toggleSection(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle('hidden');
+    }
+</script>
+</body>
+</html>

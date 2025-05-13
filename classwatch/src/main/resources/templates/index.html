@@ -1,13 +1,84 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
-    <title>ClassWatch — Загрузка отчёта</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassWatch | Загрузка отчёта</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* 3D card tilt effect */
+        .tilt { perspective: 1000px; }
+        .tilt-inner { transform-style: preserve-3d; transition: transform 0.3s ease; }
+        .tilt-inner:hover { transform: rotateX(10deg) rotateY(-10deg) scale(1.05); }
+
+        /* Animated gradient background */
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* Combined bubble float + rotate animation */
+        @keyframes bubbleAnim {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+
+        .bubbles {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden; z-index: 0;
+        }
+        .bubble {
+            position: absolute; bottom: -100px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Press Start 2P', monospace;
+            color: rgba(255, 255, 255, 0.6);
+            animation-name: bubbleAnim;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        /* Bubble variations: large, medium, small */
+        .bubble:nth-child(1) { width: 100px; height: 100px; left: 5%;  animation-duration: 22s; animation-delay: 0s; }
+        .bubble:nth-child(2) { width: 80px;  height: 80px;  left: 20%; animation-duration: 20s; animation-delay: 2s; }
+        .bubble:nth-child(3) { width: 120px; height: 120px; left: 35%; animation-duration: 24s; animation-delay: 4s; }
+        .bubble:nth-child(4) { width: 60px;  height: 60px;  left: 50%; animation-duration: 18s; animation-delay: 1s; }
+        .bubble:nth-child(5) { width: 90px;  height: 90px;  left: 65%; animation-duration: 23s; animation-delay: 3s; }
+        .bubble:nth-child(6) { width: 50px;  height: 50px;  left: 80%; animation-duration: 16s; animation-delay: 5s; }
+        /* Small bubbles */
+        .bubble:nth-child(7)  { width: 30px;  height: 30px;  left: 10%; animation-duration: 12s; animation-delay: 1s; }
+        .bubble:nth-child(8)  { width: 25px;  height: 25px;  left: 30%; animation-duration: 14s; animation-delay: 3s; }
+        .bubble:nth-child(9)  { width: 35px;  height: 35px;  left: 45%; animation-duration: 10s; animation-delay: 2s; }
+        .bubble:nth-child(10) { width: 20px;  height: 20px;  left: 60%; animation-duration: 13s; animation-delay: 4s; }
+        .bubble:nth-child(11) { width: 40px;  height: 40px;  left: 75%; animation-duration: 11s; animation-delay: 0s; }
+        .bubble:nth-child(12) { width: 25px;  height: 25px;  left: 90%; animation-duration: 15s; animation-delay: 2s; }
+    </style>
 </head>
-<body>
-<h1>Добро пожаловать в ClassWatch</h1>
-<form method="post" enctype="multipart/form-data" action="/upload">
-    <input type="file" name="file"/>
-    <button type="submit">Загрузить и проанализировать</button>
-</form>
+<body class="relative bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500 bg-[length:400%_400%] animate-gradientBG min-h-screen flex items-center justify-center overflow-hidden">
+<div class="bubbles">
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+    <div class="bubble">21</div>
+</div>
+<div class="tilt z-10 w-full max-w-lg">
+    <div class="tilt-inner bg-white bg-opacity-90 backdrop-blur-md p-10 rounded-3xl shadow-2xl">
+        <h1 class="text-4xl font-extrabold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-blue-500">ClassWatch</h1>
+        <form th:action="@{/upload}" method="post" enctype="multipart/form-data" class="flex flex-col items-center space-y-6">
+            <label class="w-full">
+                <span class="block text-gray-100 mb-2 font-semibold">Выберите Excel-файл (.xlsx):</span>
+                <input type="file" name="file" accept=".xlsx" class="w-full border-2 border-dashed border-gray-300 p-4 rounded-lg cursor-pointer transition hover:border-blue-400" />
+            </label>
+            <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transform transition active:scale-95">Загрузить и проанализировать</button>
+            <p th:if="${error}" th:text="${error}" class="mt-4 text-red-200 text-center"></p>
+        </form>
+    </div>
+</div>
 </body>
 </html>
