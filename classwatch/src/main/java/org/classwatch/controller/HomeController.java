@@ -3,6 +3,7 @@ package org.classwatch.controller;
 import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import org.classwatch.model.Student;
 import org.classwatch.service.ExcelReaderService;
+import org.classwatch.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,11 +20,13 @@ public class HomeController {
 
 
     private final ExcelReaderService excelReaderService;
+    private final ReportService reportService;
 
 
     @Autowired
-    public HomeController(ExcelReaderService excelReaderService) {
+    public HomeController(ExcelReaderService excelReaderService, ReportService reportService) {
         this.excelReaderService = excelReaderService;
+        this.reportService = reportService;
     }
 
     @GetMapping("/")
@@ -41,6 +44,10 @@ public class HomeController {
         try {
             List<Student> students = excelReaderService.readExcel(file);
             model.addAttribute("students", students);
+            model.addAttribute("statusCounts", reportService.countByStatus(students) );
+            model.addAttribute("soonDeadline", reportService.soonDeadline(students));
+            model.addAttribute("blocked", reportService.blocked(students));
+            model.addAttribute("frozen", reportService.frozen(students));
             return "result";
         }
         catch (Exception e) {

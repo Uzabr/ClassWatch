@@ -26,7 +26,7 @@
             </button>
             <div id="deadlineList" class="hidden px-6 pb-4">
                 <ul class="space-y-2">
-                    <li th:each="s : ${students}" th:if="${s.daysToDeadline &lt;= 10}" class="flex justify-between border-b pb-1">
+                    <li th:each="s : ${soonDeadline}" class="flex justify-between border-b pb-1">
                         <span th:text="${s.login}" class="font-medium"></span>
                         <span th:text="${s.daysToDeadline + ' дней'}" class="text-red-600 font-bold"></span>
                     </li>
@@ -40,7 +40,7 @@
             </button>
             <div id="blockedList" class="hidden px-6 pb-4">
                 <ul class="space-y-2">
-                    <li th:each="s : ${students}" th:if="${s.status == 'Заблокирован (дедлайн)'}" class="flex justify-between border-b pb-1">
+                    <li th:each="s : ${blocked}" class="flex justify-between border-b pb-1">
                         <span th:text="${s.login}" class="font-medium"></span>
                         <span th:text="${s.status}" class="text-red-500"></span>
                     </li>
@@ -54,7 +54,7 @@
             </button>
             <div id="frozenList" class="hidden px-6 pb-4">
                 <ul class="space-y-2">
-                    <li th:each="s : ${students}" th:if="${s.status == 'Заморожен'}" class="flex justify-between border-b pb-1">
+                    <li th:each="s : ${frozen}" class="flex justify-between border-b pb-1">
                         <span th:text="${s.login}" class="font-medium"></span>
                         <span th:text="${s.status}" class="text-blue-500"></span>
                     </li>
@@ -94,14 +94,10 @@
 </div>
 
 <script th:inline="javascript">
-    const students = /*[[${students}]]*/ [];
-    const statusCounts = {};
-    students.forEach(s => {
-        const status = s.status || 'Неизвестно';
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
-    });
+    const statusCounts = /*[[${statusCounts}]]*/ {};
+    const ctx = document.getElementById('statusChart');
 
-    new Chart(document.getElementById('statusChart'), {
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: Object.keys(statusCounts),
@@ -119,8 +115,7 @@
                 easing: 'easeOutQuart'
             },
             plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
+                legend: { display: false }
             },
             scales: {
                 y: {
