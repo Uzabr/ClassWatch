@@ -59,7 +59,7 @@ classwatch/
 │   ├── tailwind.config.js
 │   ├── postcss.config.js
 │   └── package.json
-├── pom.xml            # Мульти-модульный Maven-агрегатор
+# Корневой pom.xml отсутствует — каждый модуль независим
 ```
 
 ---
