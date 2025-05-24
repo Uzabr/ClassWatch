@@ -1,5 +1,6 @@
 package org.classwatch.service;
 
+import org.classwatch.dto.StatisticsResponse;
 import org.classwatch.model.Student;
 import org.springframework.stereotype.Service;
 
