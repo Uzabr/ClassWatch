@@ -33,4 +33,14 @@ public class ReportService {
                 .filter(s-> s.getStatus().equalsIgnoreCase("Заморожен"))
                 .collect(Collectors.toList());
     }
+
+    public List<Student> overdue(List<Student> students){
+        return students.stream()
+                .filter(s -> s.getDaysToDeadline() < 0).collect(Collectors.toList());
+    }
+
+    public List<Student> blowTarget(List<Student> students){
+        return students.stream()
+                .filter(s -> s.getLevel() < s.getTargetLevel()).collect(Collectors.toList());
+    }
 }

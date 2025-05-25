@@ -1,42 +1,67 @@
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const UploadForm = () => {
-    const [fileName, setFileName] = useState<string>("");
     const [file, setFile] = useState<File | null>(null);
-    const [result, setResult] = useState<any>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [fileName, setFileName] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const navigate = useNavigate();
+
+
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = e.target.files?.[0];
         if (selected) {
             setFile(selected);
             setFileName(selected.name);
-            setError(null);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!file) return;
+
+        if (!file) {
+            toast.error("Вы не выбрали файл.");
+            return;
+        }
+
+        if (!file.name.endsWith(".xlsx")) {
+            toast.error("Разрешены только файлы формата .xlsx.");
+            return;
+        }
 
         const formData = new FormData();
         formData.append("file", file);
 
         try {
-            const response = await axios.post("http://localhost:8080/api/upload", formData, {
+            setLoading(true);
+
+            const response = await axios.post("http://localhost:8080/api/upload/report", formData,{
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
-            setResult(response.data);
+            navigate("/report", { state: response.data });
+
         } catch (err: any) {
-            setError("Ошибка при отправке файла. Проверь подключение к backend.");
-            console.error(err);
+            if (err.response?.status === 415) {
+                toast.error("Формат файла не поддерживается.");
+            } else if (err.code === "ERR_NETWORK") {
+                toast.error("Сервер недоступен. Проверь подключение.");
+            } else {
+                toast.error("Произошла неизвестная ошибка.");
+            }
+
+            console.error("Ошибка при отправке:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-5 w-full">
+        <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-5 w-full max-w-xl mx-auto">
             <label className="w-full text-sm font-medium text-gray-700">
                 Выберите Excel-файл (.xlsx):
                 <input
@@ -53,27 +78,22 @@ const UploadForm = () => {
 
             <button
                 type="submit"
-                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-md transition active:scale-95"
+                disabled={loading}
+                className={`w-full py-2 px-4 font-semibold rounded-md shadow-md transition active:scale-95
+          ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
             >
-                Загрузить и проанализировать
+                {loading ? "Загрузка..." : "Загрузить и проанализировать"}
             </button>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            {result && (
-                <div className="text-sm text-left text-gray-800 w-full mt-4 bg-white bg-opacity-60 p-4 rounded-xl">
-                    <h2 className="text-lg font-bold mb-2">Результат анализа:</h2>
-                    <ul className="list-disc pl-5">
-                        <li>Всего студентов: {result.totalStudents}</li>
-                        <li>Заморожены: {result.frozenCount}</li>
-                        <li>Заблокированы: {result.blockedCount}</li>
-                        <li>С просрочкой: {result.overdueCount}</li>
-                        <li>Не достигли цели: {result.belowTargetCount}</li>
-                    </ul>
+            {loading && (
+                <div className="text-blue-600 text-sm animate-pulse font-medium mt-2">
+                    ⏳ Обработка файла...
                 </div>
             )}
+
         </form>
     );
 };
 
 export default UploadForm;
+
