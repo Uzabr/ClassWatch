@@ -109,11 +109,19 @@ public class StudentGroupResponse {
                 this.overdueStudents = overdueStudents;
         }
 
-        public List<Student> getBlowTargetStudents() {
+        public int getBelowTarget() {
+                return belowTarget;
+        }
+
+        public void setBelowTarget(int belowTarget) {
+                this.belowTarget = belowTarget;
+        }
+
+        public List<Student> getBelowTargetStudents() {
                 return belowTargetStudents;
         }
 
-        public void setBlowTargetStudents(List<Student> belowTargetStudents) {
+        public void setBelowTargetStudents(List<Student> belowTargetStudents) {
                 this.belowTargetStudents = belowTargetStudents;
         }
 }

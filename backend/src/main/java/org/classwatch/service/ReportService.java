@@ -1,6 +1,5 @@
 package org.classwatch.service;
 
-import org.classwatch.dto.StatisticsResponse;
 import org.classwatch.model.Student;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,7 @@ public class ReportService {
                 .filter(s -> s.getDaysToDeadline() < 0).collect(Collectors.toList());
     }
 
-    public List<Student> blowTarget(List<Student> students){
+    public List<Student> belowTarget(List<Student> students){
         return students.stream()
                 .filter(s -> s.getLevel() < s.getTargetLevel()).collect(Collectors.toList());
     }
