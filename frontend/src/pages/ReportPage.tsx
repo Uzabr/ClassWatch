@@ -31,8 +31,8 @@ interface ReportData {
   frozenStudents: Student[];
   blockedStudents: Student[];
   overdueStudents: Student[];
-  blowTargetStudents: Student[];
-  soonDeadline: Student[];
+  belowTargetStudents: Student[];
+  soonDeadlineStudents: Student[];
 }
 
 const COLORS = ["#60A5FA", "#F87171", "#FBBF24", "#34D399", "#A78BFA"];
@@ -51,18 +51,20 @@ const ReportPage: React.FC = () => {
     { key: "frozen", label: "Заморожены", value: result.frozen },
     { key: "blocked", label: "Заблокированы", value: result.blocked },
     { key: "overdue", label: "С просрочкой", value: result.overdue },
-    { key: "belowTarget", label: "Не достигли цели", value: result.blowTarget },
+    { key: "be lowTarget", label: "Не достигли цели", value: result.blowTarget },
     { key: "soonDeadline", label: "Скоро дедлайн", value: result.soonDeadlineCount },
   ];
-
+  
   const studentMap: Record<string, Student[]> = {
     total: result.totalStudents,
     frozen: result.frozenStudents,
     blocked: result.blockedStudents,
     overdue: result.overdueStudents,
-    belowTarget: result.blowTargetStudents,
-    soonDeadline: result.soonDeadline,
+    belowTarget: result.belowTargetStudents,
+    soonDeadline: result.soonDeadlineStudents,
   };
+  
+  
 
   const chartData = metrics.slice(1).map((m, i) => ({
     name: m.label,

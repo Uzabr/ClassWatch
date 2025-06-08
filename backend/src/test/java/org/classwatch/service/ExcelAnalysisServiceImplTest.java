@@ -1,5 +1,6 @@
 package org.classwatch.service;
 
+
 import org.classwatch.dto.StatisticsResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,10 +17,12 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class ExcelAnalysisServiceImplTest {
+
+
+
 
     @Autowired
     private ExcelAnalysisServiceImpl excelAnalysisService;
@@ -28,7 +31,7 @@ public class ExcelAnalysisServiceImplTest {
     void testAnalyze() throws IOException {
 
                 // Загрузка файла из resources
-                File file = new File("src/main/resources/test_files/students_info_ 24_12_SKD-3.xlsx");
+                File file = new File("src/main/resources/test_files/student.xlsx");
                 FileInputStream input = new FileInputStream(file);
 
                 MultipartFile multipartFile = new MockMultipartFile(
@@ -43,11 +46,11 @@ public class ExcelAnalysisServiceImplTest {
 
                 // Проверки
                 assertNotNull(response);
-                assertEquals(109, response.getTotalStudents());         // Пример — если в файле 5 студентов
+                assertEquals(101, response.getTotalStudents());         // Пример — если в файле 5 студентов
                 assertEquals(6, response.getFrozenCount());        // Пример — если 2 заморожены
-                assertEquals(1, response.getBlockedCount());       // и т.д.
-                assertEquals(5, response.getOverdueCount());
-                assertEquals(109, response.getBelowTargetCount());
+                assertEquals(4, response.getBlockedCount());       // и т.д.
+                assertEquals(8, response.getOverdueCount());
+                assertEquals(101, response.getBelowTargetCount());
 
     }
 }
